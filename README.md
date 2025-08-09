@@ -88,13 +88,31 @@ Le projet utilise :
 
 ## 🚀 Déploiement
 
-Pour déployer en production :
-
+### Développement local
 ```bash
 npm run build
 ```
 
 Les fichiers optimisés seront générés dans le dossier `dist/`.
+
+### GitHub Pages
+
+Pour déployer automatiquement sur GitHub Pages :
+
+1. Aller dans les **Settings** du repository
+2. Section **Pages** 
+3. Source : **GitHub Actions**
+4. Le workflow automatique se déclenchera à chaque push sur `main`
+
+Le site sera disponible à : `https://yamatoeth.github.io/GlcSolutions/`
+
+### Déploiement manuel
+
+Vous pouvez aussi déployer manuellement avec :
+```bash
+npm run build
+# Puis upload du dossier dist/ vers votre hébergeur
+```
 
 ## 🤝 Contribution
 
