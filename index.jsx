@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,7 +9,61 @@ export default function App() {
     company: '',
     message: ''
   });
+  const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  
+  // Scroll to top functionality
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Animation on scroll
+  const useIntersectionObserver = (ref, options = {}) => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      }, options);
+
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+
+      return () => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      };
+    }, [ref, options]);
+
+    return isVisible;
+  };
+
+  const heroRef = useRef();
+  const servicesRef = useRef();
+  const portfolioRef = useRef();
+  const aboutRef = useRef();
+  const contactRef = useRef();
+
+  const heroVisible = useIntersectionObserver(heroRef, { threshold: 0.1 });
+  const servicesVisible = useIntersectionObserver(servicesRef, { threshold: 0.1 });
+  const portfolioVisible = useIntersectionObserver(portfolioRef, { threshold: 0.1 });
+  const aboutVisible = useIntersectionObserver(aboutRef, { threshold: 0.1 });
+  const contactVisible = useIntersectionObserver(contactRef, { threshold: 0.1 });
   
   const [portfolio, setPortfolio] = useState([
     {
@@ -32,22 +86,101 @@ export default function App() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.name.trim()) {
+      errors.name = 'Le nom est requis';
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'L\'email est requis';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Format d\'email invalide';
+    }
+    
+    if (!formData.message.trim()) {
+      errors.message = 'Le message est requis';
+    } else if (formData.message.trim().length < 10) {
+      errors.message = 'Le message doit contenir au moins 10 caractères';
+    }
+    
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
     setIsSubmitting(true);
+    setFormErrors({});
     
-    // Simulation d'envoi
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    alert('Message envoyé avec succès !');
-    setFormData({ name: '', email: '', company: '', message: '' });
-    setIsSubmitting(false);
+    try {
+      // Simulation d'envoi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setNotification({
+        type: 'success',
+        message: 'Message envoyé avec succès ! Nous vous répondrons rapidement.'
+      });
+      setFormData({ name: '', email: '', company: '', message: '' });
+      
+      // Auto-hide notification après 5 secondes
+      setTimeout(() => setNotification(null), 5000);
+    } catch (error) {
+      setNotification({
+        type: 'error',
+        message: 'Erreur lors de l\'envoi. Veuillez réessayer.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="font-sans text-gray-900">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
+          notification.type === 'success' 
+            ? 'bg-green-50 border border-green-200 text-green-800' 
+            : 'bg-red-50 border border-red-200 text-red-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            {notification.type === 'success' ? (
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            <span className="text-sm font-medium">{notification.message}</span>
+            <button 
+              onClick={() => setNotification(null)}
+              className="ml-2 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between p-4">
@@ -56,6 +189,7 @@ export default function App() {
               src="https://images.unsplash.com/photo-1611162617213-b6e9e42c1a3b?q=80&w=200&auto=format&fit=crop"
               alt="GLC Solutions"
               className="w-10 h-10 rounded shadow"
+              loading="eager"
             />
             <div>
               <h1 className="font-bold text-lg">GLC Solutions</h1>
@@ -124,7 +258,12 @@ export default function App() {
       </header>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10 items-center">
+      <section 
+        ref={heroRef}
+        className={`max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10 items-center transition-all duration-1000 ${
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div>
           <h2 className="text-4xl font-bold mb-4">Transforming Businesses Through Technology</h2>
           <p className="text-gray-600 mb-6">
@@ -139,12 +278,20 @@ export default function App() {
             src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=900&auto=format&fit=crop"
             alt="Tech solutions"
             className="rounded shadow-lg"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </section>
 
       {/* Services */}
-      <section id="services" className="bg-gray-50 py-14">
+      <section 
+        id="services" 
+        ref={servicesRef}
+        className={`bg-gray-50 py-14 transition-all duration-1000 ${
+          servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4">
           <h3 className="text-2xl font-semibold mb-8">Our Services</h3>
           <div className="grid md:grid-cols-3 gap-6">
@@ -186,7 +333,13 @@ export default function App() {
       </section>
 
       {/* Portfolio */}
-      <section id="portfolio" className="py-14">
+      <section 
+        id="portfolio" 
+        ref={portfolioRef}
+        className={`py-14 transition-all duration-1000 ${
+          portfolioVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4">
           <h3 className="text-2xl font-semibold mb-8">Portfolio Showcase</h3>
           <div className="grid md:grid-cols-3 gap-6">
@@ -196,7 +349,9 @@ export default function App() {
                   <img 
                     src={item.img} 
                     alt={item.title} 
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300" 
+                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                 </div>
@@ -211,13 +366,21 @@ export default function App() {
       </section>
 
       {/* About */}
-      <section id="about" className="bg-gray-50 py-14">
+      <section 
+        id="about" 
+        ref={aboutRef}
+        className={`bg-gray-50 py-14 transition-all duration-1000 ${
+          aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <img
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=900&auto=format&fit=crop"
               alt="Team work"
               className="rounded shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div>
@@ -233,51 +396,86 @@ export default function App() {
       </section>
 
       {/* Contact */}
-      <section id="contact" className="py-14">
+      <section 
+        id="contact" 
+        ref={contactRef}
+        className={`py-14 transition-all duration-1000 ${
+          contactVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4">
           <h3 className="text-2xl font-semibold mb-8">Get in Touch</h3>
           <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
-            <input 
-              type="text" 
-              name="name"
-              placeholder="Full name" 
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="border border-gray-300 p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-            />
-            <input 
-              type="email" 
-              name="email"
-              placeholder="Email" 
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              className="border border-gray-300 p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-            />
-            <input 
-              type="text" 
-              name="company"
-              placeholder="Company" 
-              value={formData.company}
-              onChange={handleInputChange}
-              className="border border-gray-300 p-3 rounded md:col-span-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-            />
-            <textarea 
-              name="message"
-              placeholder="Message" 
-              rows="4" 
-              value={formData.message}
-              onChange={handleInputChange}
-              required
-              className="border border-gray-300 p-3 rounded md:col-span-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            ></textarea>
+            <div>
+              <input 
+                type="text" 
+                name="name"
+                placeholder="Full name" 
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className={`w-full border p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                  formErrors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
+            </div>
+            
+            <div>
+              <input 
+                type="email" 
+                name="email"
+                placeholder="Email" 
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className={`w-full border p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                  formErrors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+            </div>
+            
+            <div className="md:col-span-2">
+              <input 
+                type="text" 
+                name="company"
+                placeholder="Company (optionnel)" 
+                value={formData.company}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+              />
+            </div>
+            
+            <div className="md:col-span-2">
+              <textarea 
+                name="message"
+                placeholder="Message" 
+                rows="4" 
+                value={formData.message}
+                onChange={handleInputChange}
+                required
+                className={`w-full border p-3 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                  formErrors.message ? 'border-red-500' : 'border-gray-300'
+                }`}
+              ></textarea>
+              {formErrors.message && <p className="text-red-500 text-sm mt-1">{formErrors.message}</p>}
+            </div>
+            
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-600 text-white px-5 py-2 rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all md:col-span-2"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all duration-200 md:col-span-2"
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Envoi en cours...
+                </span>
+              ) : 'Envoyer le message'}
             </button>
           </form>
         </div>
@@ -334,6 +532,19 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl transform hover:scale-110 transition-all duration-300 z-40"
+          aria-label="Back to top"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

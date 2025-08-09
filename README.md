@@ -88,6 +88,25 @@ Le projet utilise :
 
 ## 🚀 Déploiement
 
+### GitHub Pages (Automatique) ✅
+
+Le site est **automatiquement déployé** sur GitHub Pages à chaque push sur la branche `main`.
+
+**🌐 URL du site en ligne** : [`https://yamatoeth.github.io/GlcSolutions/`](https://yamatoeth.github.io/GlcSolutions/)
+
+#### Configuration GitHub Pages :
+1. Le workflow GitHub Actions est déjà configuré dans `.github/workflows/deploy.yml`
+2. Aller dans **Settings** → **Pages** du repository
+3. Source : **GitHub Actions** (déjà configuré)
+4. Le déploiement se fait automatiquement !
+
+#### Fonctionnalités du déploiement :
+- ✅ Build automatique avec Vite
+- ✅ Lint check avant déploiement
+- ✅ Optimisation des bundles
+- ✅ Séparation vendor/app chunks
+- ✅ Déploiement uniquement si le build réussit
+
 ### Développement local
 ```bash
 npm run build

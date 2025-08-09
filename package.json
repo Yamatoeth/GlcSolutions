@@ -1,13 +1,19 @@
 {
   "name": "glc-solutions-website",
   "version": "1.0.0",
+  "type": "module",
   "description": "Corporate website for GLC Solutions",
   "main": "index.jsx",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:check": "npm run lint && npm run build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext js,jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "deploy": "npm run build && echo 'Build completed! Push to main branch to deploy to GitHub Pages.'"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -21,6 +27,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.33",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.12"
   },
