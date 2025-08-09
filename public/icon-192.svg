@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="48" fill="#2563EB"/>
+  <path d="M48 72C48 65.3726 53.3726 60 60 60H84C90.6274 60 96 65.3726 96 72V120C96 126.627 90.6274 132 84 132H60C53.3726 132 48 126.627 48 120V72Z" fill="white"/>
+  <path d="M108 48C108 41.3726 113.373 36 120 36H144C150.627 36 156 41.3726 156 48V144C156 150.627 150.627 156 144 156H120C113.373 156 108 150.627 108 144V48Z" fill="white"/>
+  <circle cx="72" cy="96" r="12" fill="#2563EB"/>
+  <circle cx="132" cy="96" r="12" fill="#2563EB"/>
+  <text x="96" y="175" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">GLC</text>
+</svg>

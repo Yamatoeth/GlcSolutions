@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="#2563EB"/>
+  <path d="M128 192C128 174.327 142.327 160 160 160H224C241.673 160 256 174.327 256 192V320C256 337.673 241.673 352 224 352H160C142.327 352 128 337.673 128 320V192Z" fill="white"/>
+  <path d="M288 128C288 110.327 302.327 96 320 96H384C401.673 96 416 110.327 416 128V384C416 401.673 401.673 416 384 416H320C302.327 416 288 401.673 288 384V128Z" fill="white"/>
+  <circle cx="192" cy="256" r="32" fill="#2563EB"/>
+  <circle cx="352" cy="256" r="32" fill="#2563EB"/>
+  <text x="256" y="460" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="bold">GLC</text>
+  <text x="256" y="480" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" opacity="0.8">SOLUTIONS</text>
+</svg>
