@@ -186,7 +186,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <img
-              src="/logo.svg"
+              src="/icon-512.svg"
               alt="GLC Solutions logo"
               className="w-10 h-10 rounded shadow"
               loading="eager"
